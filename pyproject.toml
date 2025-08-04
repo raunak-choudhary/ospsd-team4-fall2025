@@ -1,7 +1,8 @@
-# Root workspace configuration for OSPSD TA Task
+# Root workspace configuration
 [tool.uv.workspace]
 members = [
     "src/email_api",
+    "src/gmail_impl",
 ]
 
 [project]
@@ -15,6 +16,7 @@ dependencies = []
 [tool.uv.sources]
 # Workspace component sources
 email-api = { workspace = true }
+gmail-impl = { workspace = true }
 
 [project.optional-dependencies]
 # Shared development tools used across all workspace components
@@ -35,53 +37,34 @@ dev = [
 email = [
     "email-api>=0.1.0",
 ]
-
+gmail = [
+    "gmail-impl>=0.1.0",
+]
 
 # Shared tool configuration for all workspace members
 [tool.ruff]
 target-version = "py312"
 line-length = 88
+fix = true
 src = ["src"]
 
 [tool.ruff.lint]
-# Enable ALL available rules - start strict, then selectively disable with documentation
+# Enable all rules by default, then disable specific ones
 select = ["ALL"]
-
 ignore = [
-    # === DOCUMENTED EXCEPTIONS ===
-    
-    # Docstring formatting conflicts
-    "D203",    # one-blank-line-before-class (conflicts with D211)
-    "D213",    # multi-line-docstring-summary-second-line (conflicts with D212)
-    
-    # Test-specific allowances  
-    "S101",    # assert statements (essential for tests)
-    "PLR2004", # magic values (acceptable in tests for clarity)
-    "EM101",   # string literals in exceptions (acceptable in tests)
-    "TRY003",  # long exception messages (acceptable in tests)
-    
-    # Type annotation allowances
-    "ANN401",  # Any type (required for __aexit__ method signature)
-    
-    # Import organization (handled by isort integration)
-    "I001",    # import sorting (let ruff handle this automatically)
-    
-    # Performance micro-optimizations (not critical for this codebase)
-    "PERF203", # try-except in loop (readability over micro-optimization)
-    
-    # Module-level docstrings (covered by component-level docs)  
-    "D100",    # missing-docstring-in-public-module
-    
-    # Complexity limits (these are interface definitions, not implementations)
-    "C901",    # complex-structure (not applicable to protocol definitions)
-    "PLR0913", # too-many-arguments (protocol methods need flexibility)
+    "D203",    # one-blank-line-before-class conflicts with D211
+    "D213",    # multi-line-docstring-summary-second-line conflicts with D212
+    "COM812",  # trailing-comma-missing conflicts with formatter
+    "ISC001",  # single-line-implicit-string-concatenation conflicts with formatter
+    "T201",    # print statements allowed in examples and demos
 ]
 
+# Per-directory rule customization
 [tool.ruff.lint.per-file-ignores]
 "tests/*" = [
     "D",       # docstrings not required in tests
-    "ANN",     # type annotations not required in tests  
-    "ARG",     # unused arguments common in test fixtures
+    "ANN",     # type annotations not required in tests
+    "ARG",     # unused arguments common in test fixtures  
     "FBT",     # boolean positional args ok in tests
     "S",       # security checks less relevant in tests
     "PLR",     # complexity checks not needed in tests
@@ -96,8 +79,13 @@ ignore = [
     "PLR",     # complexity checks not needed in tests
     "SLF001",  # private member access (needed for testing)
 ]
-"main.py" = [
-    "T201",    # print statements (appropriate for demo/entry scripts)
+"*/examples/*" = [
+    "D",       # docstrings not required in examples
+    "ANN",     # type annotations not required in examples
+    "ARG",     # unused arguments common in examples
+    "FBT",     # boolean positional args ok in examples
+    "S",       # security checks less relevant in examples
+    "PLR",     # complexity checks not needed in examples
 ]
 
 [tool.ruff.lint.pydocstyle]
@@ -131,6 +119,18 @@ strict_equality = true
 strict_concatenate = true
 show_error_codes = true
 show_column_numbers = true
+explicit_package_bases = true
+namespace_packages = true
+# Set mypy path to resolve workspace components correctly
+mypy_path = "src/email_api/src:src/gmail_impl/src"
+
+# Ignore missing stubs for external libraries that don't provide them
+[[tool.mypy.overrides]]
+module = [
+    "googleapiclient.*",
+    "google_auth_oauthlib.*",
+]
+ignore_missing_imports = true
 
 # Workspace-level pytest configuration
 [tool.pytest.ini_options]
@@ -140,11 +140,12 @@ addopts = [
     "--strict-config",
     "--cov-report=html",
     "--cov-report=term-missing",
+    "--import-mode=importlib",
 ]
 testpaths = ["src/*/tests", "tests"]
 markers = [
     "unit: marks tests as unit tests",
-    "integration: marks tests as integration tests",
+    "integration: marks tests as integration tests", 
     "e2e: marks tests as end-to-end tests",
 ]
 asyncio_mode = "auto"

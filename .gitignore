@@ -274,3 +274,15 @@ Temporary Items
 
 # Ruff cache
 .ruff_cache/
+
+# OAuth2 credentials and tokens (SECURITY SENSITIVE)
+credentials.json
+*token*.json
+*_token.json
+oauth_*.json
+
+# API keys and secrets
+.env
+.env.*
+*.key
+*.pem

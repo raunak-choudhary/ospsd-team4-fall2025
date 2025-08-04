@@ -1,9 +1,9 @@
-site_name: OSPSD TA Task - Component-Based Email System
-site_description: Professional software development demonstration using component-based architecture and dependency injection patterns
-site_url: https://your-username.github.io/ospsd-ta-task
+site_name: Email Client
+site_description: Professional email client implementation using component-based architecture, dependency injection patterns, and modern Python development practices
+site_url: https://github.com/adithyab-20/ospsd-ta-task
 
-repo_name: ospsd-ta-task
-repo_url: https://github.com/your-username/ospsd-ta-task
+repo_name: email-client
+repo_url: https://github.com/adithyab-20/ospsd-ta-task
 edit_uri: edit/main/
 
 # Configuration
@@ -61,15 +61,20 @@ plugins:
             show_root_heading: true
             show_root_toc_entry: false
             merge_init_into_class: true
-          paths: [src/email_api/src]
+          paths: [src/email_api/src, src/gmail_impl/src]
 
-# Navigation - using only existing files
+# Navigation
 nav:
   - Home: index.md
+  - Getting Started: getting-started/index.md
   - API Reference:
-    - Interfaces: reference/interfaces.md
-    - Models: reference/models.md
-    - Exceptions: reference/exceptions.md
+    - Email API:
+      - Interfaces: reference/interfaces.md
+      - Models: reference/models.md
+      - Exceptions: reference/exceptions.md
+    - Gmail Implementation:
+      - Client: reference/gmail-client.md
+      - Configuration: reference/gmail-config.md
 
 # Copyright
-copyright: "&copy; 2024 OSPSD TA Task. Licensed under MIT License." 
+copyright: "&copy; 2024 Email Client. Licensed under MIT License." 

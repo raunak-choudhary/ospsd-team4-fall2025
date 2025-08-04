@@ -4,7 +4,7 @@ Protocol-based email client interface for dependency injection and modular archi
 
 ## Overview
 
-The `email_api` component provides type-safe interfaces for email client implementations. It defines contracts without implementation details, enabling dependency injection and testable architectures.
+The `email-api` component provides type-safe interfaces for email client implementations. It defines contracts without implementation details, enabling dependency injection and testable architectures.
 
 ## Features
 
@@ -72,11 +72,11 @@ if email.has_content:
 ### Exception Handling
 
 ```python
-from email_api import EmailError, EmailConnectionError, EmailAuthError
+from email_api import EmailError, EmailConnectionError, EmailAuthenticationError
 
 try:
     emails = await client.list_inbox_messages()
-except EmailAuthError as e:
+except EmailAuthenticationError as e:
     print(f"Authentication failed: {e}")
 except EmailConnectionError as e:
     print(f"Connection error: {e}")
@@ -127,7 +127,7 @@ uv run ruff check src/email_api/
 
 ## Quality Standards
 
-- **99%+ Test Coverage**: Comprehensive unit test suite
+- **Comprehensive Test Coverage**: Extensive unit test suite
 - **Strict Type Checking**: Full mypy strict mode compliance  
 - **Clean Code**: All ruff rules enabled with documented exceptions
 - **Async Context Management**: Proper resource handling patterns
@@ -135,5 +135,5 @@ uv run ruff check src/email_api/
 
 ---
 
-**Part of**: OSPSD TA Task - Email Client Components  
+**Component**: Email API Interface  
 **License**: MIT
