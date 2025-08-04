@@ -318,6 +318,7 @@ workflows:
                 - main
                 - develop
                 - /feature\/.*integration.*/
+                - /feat\/.*gmail.*/
       - test-e2e:
           requires:
             - test-integration
@@ -327,6 +328,7 @@ workflows:
               only: 
                 - main
                 - /feature\/.*e2e.*/
+                - /feat\/.*gmail.*/
       - build:
           requires:
             - test-unit
