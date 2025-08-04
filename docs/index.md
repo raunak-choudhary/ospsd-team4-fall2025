@@ -109,4 +109,4 @@ MIT License - See LICENSE file for details.
 ---
 
 **Course**: Open Source Professional Software Development  
-**Assignment**: Teaching Assistant Demonstration Project
+**Assignment**: Teaching Assistant Demonstration Project 

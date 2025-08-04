@@ -1,0 +1,195 @@
+version: 2.1
+
+# Use orbs for common functionality
+orbs:
+  python: circleci/python@2.1
+
+# Define jobs
+jobs:
+  lint:
+    docker:
+      - image: cimg/python:3.12
+    steps:
+      - checkout
+      
+      # Install uv
+      - run:
+          name: Install uv
+          command: |
+            curl -LsSf https://astral.sh/uv/install.sh | sh
+            echo 'export PATH="$HOME/.cargo/bin:$PATH"' >> $BASH_ENV
+            source $BASH_ENV
+      
+      # Cache uv dependencies
+      - restore_cache:
+          keys:
+            - v1-lint-deps-{{ checksum "uv.lock" }}
+            - v1-lint-deps-
+      
+      # Install dependencies
+      - run:
+          name: Install dependencies
+          command: |
+            source $BASH_ENV
+            uv sync --extra dev --extra email
+      
+      # Save cache
+      - save_cache:
+          paths:
+            - .venv
+            - ~/.cache/uv
+          key: v1-lint-deps-{{ checksum "uv.lock" }}
+      
+      # Run ruff linting
+      - run:
+          name: Run ruff
+          command: |
+            source $BASH_ENV
+            uv run ruff check src/
+      
+      # Run mypy type checking
+      - run:
+          name: Run mypy
+          command: |
+            source $BASH_ENV
+            uv run mypy src/
+
+  test:
+    docker:
+      - image: cimg/python:3.12
+    steps:
+      - checkout
+      
+      # Install uv
+      - run:
+          name: Install uv
+          command: |
+            curl -LsSf https://astral.sh/uv/install.sh | sh
+            echo 'export PATH="$HOME/.cargo/bin:$PATH"' >> $BASH_ENV
+            source $BASH_ENV
+      
+      # Cache uv dependencies
+      - restore_cache:
+          keys:
+            - v1-test-deps-{{ checksum "uv.lock" }}
+            - v1-test-deps-
+      
+      # Install dependencies
+      - run:
+          name: Install dependencies
+          command: |
+            source $BASH_ENV
+            uv sync --extra dev --extra email
+      
+      # Save cache
+      - save_cache:
+          paths:
+            - .venv
+            - ~/.cache/uv
+          key: v1-test-deps-{{ checksum "uv.lock" }}
+      
+      # Run tests with coverage
+      - run:
+          name: Run tests
+          command: |
+            source $BASH_ENV
+            mkdir -p test-results
+            uv run pytest src/email_api/tests/ \
+              --cov=src/email_api/src/email_api \
+              --cov-report=term-missing \
+              --cov-report=html \
+              --cov-fail-under=85 \
+              --junit-xml=test-results/junit.xml
+      
+      # Store test results and coverage artifacts
+      - store_test_results:
+          path: test-results
+      - store_artifacts:
+          path: htmlcov
+          destination: coverage-report
+      - store_artifacts:
+          path: test-results
+          destination: test-results
+
+  build:
+    docker:
+      - image: cimg/python:3.12
+    steps:
+      - checkout
+      
+      # Install uv
+      - run:
+          name: Install uv
+          command: |
+            curl -LsSf https://astral.sh/uv/install.sh | sh
+            echo 'export PATH="$HOME/.cargo/bin:$PATH"' >> $BASH_ENV
+            source $BASH_ENV
+      
+      # Cache uv dependencies
+      - restore_cache:
+          keys:
+            - v1-build-deps-{{ checksum "uv.lock" }}
+            - v1-build-deps-
+      
+      # Install dependencies
+      - run:
+          name: Install dependencies
+          command: |
+            source $BASH_ENV
+            uv sync --extra dev --extra email
+      
+      # Save cache
+      - save_cache:
+          paths:
+            - .venv
+            - ~/.cache/uv
+          key: v1-build-deps-{{ checksum "uv.lock" }}
+      
+      # Build the email-api component
+      - run:
+          name: Build email-api component
+          command: |
+            source $BASH_ENV
+            cd src/email_api
+            uv build
+      
+      # Store build artifacts
+      - store_artifacts:
+          path: dist/
+          destination: email-api-build
+
+# Define workflows
+workflows:
+  version: 2
+  test-and-build:
+    jobs:
+      - lint
+      - test:
+          requires:
+            - lint
+      - build:
+          requires:
+            - test
+          filters:
+            branches:
+              only: 
+                - main
+                - develop
+
+  # Run on all branches for pull requests
+  pr-check:
+    jobs:
+      - lint:
+          filters:
+            branches:
+              ignore: 
+                - main
+                - develop
+      - test:
+          requires:
+            - lint
+          filters:
+            branches:
+              ignore: 
+                - main
+                - develop 
