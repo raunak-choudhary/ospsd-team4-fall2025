@@ -1,9 +1,5 @@
 version: 2.1
 
-# Use orbs for common functionality
-orbs:
-  python: circleci/python@2.1
-
 # Define jobs
 jobs:
   lint:
