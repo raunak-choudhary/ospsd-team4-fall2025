@@ -22,7 +22,7 @@ Component-based system where each component:
 ## Project Structure
 
 ```
-ospsd-ta-task/
+email-client/
 ├── src/
 │   ├── email_api/              # Interface component
 │   ├── gmail_impl/             # Gmail implementation component
@@ -43,7 +43,7 @@ ospsd-ta-task/
 
 ```bash
 git clone <repository-url>
-cd ospsd-ta-task
+cd email-client-system
 
 # Full development setup
 uv sync --extra dev --extra email --extra gmail
@@ -109,4 +109,4 @@ async def process_emails(client: EmailClient) -> None:
 
 ## License
 
-MIT License - See LICENSE file for details.
+MIT License - See LICENSE file for details. 

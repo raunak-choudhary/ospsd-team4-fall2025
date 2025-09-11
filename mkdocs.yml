@@ -1,0 +1,80 @@
+site_name: Email Client
+site_description: Professional email client implementation using component-based architecture, dependency injection patterns, and modern Python development practices
+site_url: https://github.com/adithyab-20/ospsd-ta-task
+
+repo_name: email-client
+repo_url: https://github.com/adithyab-20/ospsd-ta-task
+edit_uri: edit/main/
+
+# Configuration
+theme:
+  name: material
+  palette:
+    - scheme: default
+      primary: blue
+      accent: blue
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: blue
+      accent: blue
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - search.highlight
+    - content.code.copy
+    - content.code.select
+
+# Extensions
+markdown_extensions:
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - toc:
+      permalink: true
+  - pymdownx.details
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+
+# Plugins
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          options:
+            docstring_style: google
+            show_source: true
+            show_root_heading: true
+            show_root_toc_entry: false
+            merge_init_into_class: true
+          paths: [src/email_api/src, src/gmail_impl/src]
+
+# Navigation
+nav:
+  - Home: index.md
+  - Getting Started: getting-started/index.md
+  - API Reference:
+    - Email API:
+      - Interfaces: reference/interfaces.md
+      - Models: reference/models.md
+      - Exceptions: reference/exceptions.md
+    - Gmail Implementation:
+      - Client: reference/gmail-client.md
+      - Configuration: reference/gmail-config.md
+
+# Copyright
+copyright: "&copy; 2024 Email Client. Licensed under MIT License." 

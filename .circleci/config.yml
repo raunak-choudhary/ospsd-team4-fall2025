@@ -1,0 +1,357 @@
+version: 2.1
+
+# Define jobs
+jobs:
+  lint:
+    docker:
+      - image: cimg/python:3.12
+    steps:
+      - checkout
+      
+      # Install uv
+      - run:
+          name: Install uv
+          command: |
+            curl -LsSf https://astral.sh/uv/install.sh | sh
+            echo 'export PATH="$HOME/.cargo/bin:$PATH"' >> $BASH_ENV
+            source $BASH_ENV
+      
+      # Cache uv dependencies
+      - restore_cache:
+          keys:
+            - v1-lint-deps-{{ checksum "uv.lock" }}
+            - v1-lint-deps-
+      
+      # Install dependencies
+      - run:
+          name: Install dependencies
+          command: |
+            source $BASH_ENV
+            uv sync --extra dev --extra email --extra gmail
+      
+      # Save cache
+      - save_cache:
+          paths:
+            - .venv
+            - ~/.cache/uv
+          key: v1-lint-deps-{{ checksum "uv.lock" }}
+      
+      # Run ruff linting
+      - run:
+          name: Run ruff
+          command: |
+            source $BASH_ENV
+            uv run ruff check .
+      
+      # Run mypy type checking
+      - run:
+          name: Run mypy
+          command: |
+            source $BASH_ENV
+            uv run mypy .
+
+  test-unit:
+    docker:
+      - image: cimg/python:3.12
+    steps:
+      - checkout
+      
+      # Install uv
+      - run:
+          name: Install uv
+          command: |
+            curl -LsSf https://astral.sh/uv/install.sh | sh
+            echo 'export PATH="$HOME/.cargo/bin:$PATH"' >> $BASH_ENV
+            source $BASH_ENV
+      
+      # Cache uv dependencies
+      - restore_cache:
+          keys:
+            - v1-test-deps-{{ checksum "uv.lock" }}
+            - v1-test-deps-
+      
+      # Install dependencies
+      - run:
+          name: Install dependencies
+          command: |
+            source $BASH_ENV
+            uv sync --extra dev --extra email --extra gmail
+      
+      # Save cache
+      - save_cache:
+          paths:
+            - .venv
+            - ~/.cache/uv
+          key: v1-test-deps-{{ checksum "uv.lock" }}
+      
+      # Run unit tests with coverage
+      - run:
+          name: Run unit tests
+          command: |
+            source $BASH_ENV
+            mkdir -p test-results
+            uv run pytest src/email_api/tests/ src/gmail_impl/tests/ \
+              --cov=src/email_api/src/email_api \
+              --cov=src/gmail_impl/src/gmail_impl \
+              --cov-report=term-missing \
+              --cov-report=html \
+              --cov-fail-under=85 \
+              --junit-xml=test-results/junit.xml
+      
+      # Store test results and coverage artifacts
+      - store_test_results:
+          path: test-results
+      - store_artifacts:
+          path: htmlcov
+          destination: coverage-report
+      - store_artifacts:
+          path: test-results
+          destination: test-results
+
+  test-integration:
+    docker:
+      - image: cimg/python:3.12
+    steps:
+      - checkout
+      
+      # Install uv
+      - run:
+          name: Install uv
+          command: |
+            curl -LsSf https://astral.sh/uv/install.sh | sh
+            echo 'export PATH="$HOME/.cargo/bin:$PATH"' >> $BASH_ENV
+            source $BASH_ENV
+      
+      # Cache uv dependencies
+      - restore_cache:
+          keys:
+            - v1-integration-deps-{{ checksum "uv.lock" }}
+            - v1-integration-deps-
+      
+      # Install dependencies
+      - run:
+          name: Install dependencies
+          command: |
+            source $BASH_ENV
+            uv sync --extra dev --extra email --extra gmail
+      
+      # Save cache
+      - save_cache:
+          paths:
+            - .venv
+            - ~/.cache/uv
+          key: v1-integration-deps-{{ checksum "uv.lock" }}
+      
+      # Setup Gmail credentials from environment variables
+      - run:
+          name: Setup Gmail credentials
+          command: |
+            # Create credentials.json from environment variable
+            echo "$GMAIL_CREDENTIALS_JSON" > credentials.json
+            
+            # Create CI token file from environment variable if provided
+            if [ ! -z "$GMAIL_CI_TOKEN_JSON" ]; then
+              echo "$GMAIL_CI_TOKEN_JSON" > ci_token.json
+            fi
+      
+      # Run integration tests
+      - run:
+          name: Run integration tests
+          command: |
+            source $BASH_ENV
+            mkdir -p test-results
+            # Use CI token file if available, otherwise tests will create new one
+            export GMAIL_TOKEN_FILE=${GMAIL_CI_TOKEN_JSON:+ci_token.json}
+            export GMAIL_TOKEN_FILE=${GMAIL_TOKEN_FILE:-test_token.json}
+            
+            uv run pytest tests/integration/ \
+              --junit-xml=test-results/integration-junit.xml \
+              -v
+      
+      # Store test results
+      - store_test_results:
+          path: test-results
+      - store_artifacts:
+          path: test-results
+          destination: integration-test-results
+
+  test-e2e:
+    docker:
+      - image: cimg/python:3.12
+    steps:
+      - checkout
+      
+      # Install uv
+      - run:
+          name: Install uv
+          command: |
+            curl -LsSf https://astral.sh/uv/install.sh | sh
+            echo 'export PATH="$HOME/.cargo/bin:$PATH"' >> $BASH_ENV
+            source $BASH_ENV
+      
+      # Cache uv dependencies
+      - restore_cache:
+          keys:
+            - v1-e2e-deps-{{ checksum "uv.lock" }}
+            - v1-e2e-deps-
+      
+      # Install dependencies
+      - run:
+          name: Install dependencies
+          command: |
+            source $BASH_ENV
+            uv sync --extra dev --extra email --extra gmail
+      
+      # Save cache
+      - save_cache:
+          paths:
+            - .venv
+            - ~/.cache/uv
+          key: v1-e2e-deps-{{ checksum "uv.lock" }}
+      
+      # Setup Gmail credentials from environment variables
+      - run:
+          name: Setup Gmail credentials
+          command: |
+            # Create credentials.json from environment variable
+            echo "$GMAIL_CREDENTIALS_JSON" > credentials.json
+            
+            # Create E2E token file from environment variable if provided
+            if [ ! -z "$GMAIL_E2E_TOKEN_JSON" ]; then
+              echo "$GMAIL_E2E_TOKEN_JSON" > e2e_token.json
+            fi
+      
+      # Run E2E tests
+      - run:
+          name: Run E2E tests
+          command: |
+            source $BASH_ENV
+            mkdir -p test-results
+            uv run pytest tests/e2e/ \
+              --junit-xml=test-results/e2e-junit.xml \
+              -v
+      
+      # Store test results
+      - store_test_results:
+          path: test-results
+      - store_artifacts:
+          path: test-results
+          destination: e2e-test-results
+
+  build:
+    docker:
+      - image: cimg/python:3.12
+    steps:
+      - checkout
+      
+      # Install uv
+      - run:
+          name: Install uv
+          command: |
+            curl -LsSf https://astral.sh/uv/install.sh | sh
+            echo 'export PATH="$HOME/.cargo/bin:$PATH"' >> $BASH_ENV
+            source $BASH_ENV
+      
+      # Cache uv dependencies
+      - restore_cache:
+          keys:
+            - v1-build-deps-{{ checksum "uv.lock" }}
+            - v1-build-deps-
+      
+      # Install dependencies
+      - run:
+          name: Install dependencies
+          command: |
+            source $BASH_ENV
+            uv sync --extra dev --extra email --extra gmail
+      
+      # Save cache
+      - save_cache:
+          paths:
+            - .venv
+            - ~/.cache/uv
+          key: v1-build-deps-{{ checksum "uv.lock" }}
+      
+      # Build components
+      - run:
+          name: Build components
+          command: |
+            source $BASH_ENV
+            # Build email-api component
+            cd src/email_api
+            uv build
+            cd ../..
+            
+            # Build gmail-impl component
+            cd src/gmail_impl
+            uv build
+            cd ../..
+      
+      # Store build artifacts
+      - store_artifacts:
+          path: src/email_api/dist/
+          destination: email-api-build
+      - store_artifacts:
+          path: src/gmail_impl/dist/
+          destination: gmail-impl-build
+
+# Define workflows
+workflows:
+  version: 2
+  full-test-suite:
+    jobs:
+      - lint
+      - test-unit:
+          requires:
+            - lint
+      - test-integration:
+          requires:
+            - test-unit
+          # Only run integration tests on main/develop branches or when explicitly triggered
+          filters:
+            branches:
+              only: 
+                - main
+                - develop
+                - /feature\/.*integration.*/
+                - /feat\/.*gmail.*/
+      - test-e2e:
+          requires:
+            - test-integration
+          # Only run E2E tests on main branch or when explicitly triggered
+          filters:
+            branches:
+              only: 
+                - main
+                - /feature\/.*e2e.*/
+                - /feat\/.*gmail.*/
+      - build:
+          requires:
+            - test-unit
+          filters:
+            branches:
+              only: 
+                - main
+                - develop
+
+  # Quick PR check workflow (no Gmail tests)
+  pr-check:
+    jobs:
+      - lint:
+          filters:
+            branches:
+              ignore: 
+                - main
+                - develop
+                - /feature\/.*integration.*/
+                - /feature\/.*e2e.*/
+      - test-unit:
+          requires:
+            - lint
+          filters:
+            branches:
+              ignore: 
+                - main
+                - develop
+                - /feature\/.*integration.*/
+                - /feature\/.*e2e.*/ 
