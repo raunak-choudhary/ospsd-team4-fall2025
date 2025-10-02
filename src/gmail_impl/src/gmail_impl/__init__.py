@@ -1,28 +1,13 @@
-"""Gmail implementation of the EmailClient protocol.
+"""Gmail implementation of the Client protocol.
 
-This component provides a concrete implementation of the EmailClient protocol
-using the Gmail API with OAuth2 authentication and dependency injection.
-
-Example usage:
-    import asyncio
-    from gmail_impl import GmailClient, GmailConfig
-
-    async def main():
-        config = GmailConfig(
-            credentials_file="credentials.json",
-            token_file="token.json"
-        )
-
-        async with GmailClient(config) as client:
-            emails = await client.list_inbox_messages(limit=5)
-            if emails:
-                content = await client.get_email_content(emails[0].id)
-                print(f"Subject: {content.subject}")
-
-    asyncio.run(main())
+This component provides a concrete implementation of the Client protocol
+using the Gmail API with OAuth2 authentication.
 """
 
-from .client import GmailClient
-from .config import GmailConfig
+import email_api
+from gmail_impl.gmail_client import GmailClient
 
-__all__ = ["GmailClient", "GmailConfig"]
+__all__ = ["GmailClient"]
+
+# Dependency injection: Replace email_api.get_client with our implementation
+email_api.get_client = lambda: GmailClient()

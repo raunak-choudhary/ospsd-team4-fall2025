@@ -10,34 +10,22 @@ This component focuses on the core requirement: building an Email Client that ca
 crawl your inbox, pick an email, and get its content.
 
 Example usage:
-    from email_api import EmailClient, Email
+    from email_api import Client, Email
 
     # Your implementation will inject the actual client
-    async def process_emails(client: EmailClient) -> None:
-        emails = await client.list_inbox_messages(limit=5)
-        if emails:
-            email_content = await client.get_email_content(emails[0].id)
-            print(f"Subject: {email_content.subject}")
-            print(f"From: {email_content.sender}")
+    def process_emails(client: Client) -> None:
+        for email in client.get_messages():
+            print(f"Subject: {email.subject}")
+            print(f"From: {email.sender}")
 """
 
-from .exceptions import (
-    EmailAuthenticationError,
-    EmailConnectionError,
-    EmailError,
-    EmailNotFoundError,
-)
-from .interfaces import EmailClient
-from .models import Email, EmailAddress
+from email_api.client import Client, Email, EmailAddress, get_client
 
 __all__ = [
+    "Client",
     "Email",
     "EmailAddress",
-    "EmailAuthenticationError",
-    "EmailClient",
-    "EmailConnectionError",
-    "EmailError",
-    "EmailNotFoundError",
+    "get_client",
 ]
 
 __version__ = "0.1.0"

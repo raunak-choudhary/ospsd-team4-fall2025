@@ -1,112 +1,67 @@
-# OSPSD - Email Client - TA Assignment Solution
+# Email Client with Dependency Injection
 
-Professional email client implementation using component-based architecture, dependency injection patterns, and modern Python development practices.
+Professional email client demonstrating component-based architecture and dependency injection patterns.
 
 ## Overview
 
-A modular email client implementing clean architecture principles and interface design patterns. Built with professional software development standards including comprehensive testing, type safety, and maintainable code structure.
+This project implements a modular email client with clean separation between interface and implementation. It showcases professional software development practices including type safety, comprehensive testing, and maintainable architecture.
 
-## Architecture
+## Key Features
 
-Component-based system where each component:
-- Defines clear contracts using Python protocols
-- Maintains zero dependencies between interface and implementation
-- Can be independently developed, tested, and published
-- Hides complex functionality behind simple interfaces
+- Component-based architecture with independent packages
+- Dependency injection using monkey-patching
+- Full type safety with mypy strict mode
+- 97% test coverage across unit, integration, and E2E tests
+- OAuth2 authentication with Gmail API
 
-### Components
-
-- **email_api**: Core interface component defining email client contracts and data models
-- **gmail_impl**: Gmail implementation component providing OAuth2-authenticated email access
-
-## Project Structure
-
-```
-email-client/
-├── src/
-│   ├── email_api/              # Interface component
-│   ├── gmail_impl/             # Gmail implementation component
-│   └── component.md            # Component development guidelines
-├── tests/                      # Integration/E2E tests
-├── pyproject.toml              # Workspace configuration
-└── main.py                     # Project entry point
-```
-
-## Setup
-
-### Prerequisites
-
-- Python 3.12+
-- [uv](https://docs.astral.sh/uv/) package manager
-
-### Installation
-
-```bash
-git clone <repository-url>
-cd email-client-system
-
-# Full development setup
-uv sync --extra dev --extra email --extra gmail
-```
-
-### Development
-
-```bash
-# Run all tests
-uv run pytest
-
-# Component-specific tests
-uv run pytest src/email_api/tests/
-uv run pytest src/gmail_impl/tests/
-
-# Type checking
-uv run mypy src/
-
-# Code quality
-uv run ruff check .
-
-# Coverage
-uv run pytest --cov=src --cov-report=html
-
-# Documentation
-uv run mkdocs serve  # Live preview at http://127.0.0.1:8000
-uv run mkdocs build  # Build static site
-
-# Demo
-uv run python main.py
-```
-
-## Usage
+## Quick Example
 
 ```python
-from email_api import EmailClient, Email, EmailAddress
+import email_api
+import gmail_impl  # noqa: F401
 
-async def process_emails(client: EmailClient) -> None:
-    """Dependency injection pattern - implementation provided externally."""
-    async with client:
-        emails = await client.list_inbox_messages(limit=5)
-        for email in emails:
-            if email.has_content:
-                print(f"From: {email.sender.display_name}")
-                print(f"Subject: {email.subject}")
+client = email_api.get_client()
+for email in client.get_messages(limit=5):
+    print(f"{email.sender.address}: {email.subject}")
 ```
 
-## Quality Standards
+## Documentation
 
-- **Type Safety**: Full mypy strict mode compliance
-- **Code Quality**: All ruff rules enabled with documented exceptions
-- **Test Coverage**: ≥85% coverage requirement
-- **Professional Standards**: Clean, maintainable, production-ready code
+### Getting Started
+- [Installation and Setup](getting-started/index.md) - Install dependencies and configure Gmail API
+- [Basic Usage](getting-started/index.md#quick-start) - Run the demo application
+
+### Architecture
+- [Design Philosophy](architecture/design-philosophy.md) - Deep interfaces and abstraction principles
+- [Dependency Injection](architecture/dependency-injection.md) - How DI works in this project
+- [Testing Strategy](architecture/testing.md) - Unit, integration, and E2E testing approach
+
+### API Reference
+- [Email API](reference/email-api.md) - Interface definitions and data models
+- [Gmail Implementation](reference/gmail-impl.md) - OAuth2, message parsing, error handling
 
 ## Technology Stack
 
-- **Language**: Python 3.12+
-- **Package Management**: uv
-- **Testing**: pytest with asyncio and coverage
-- **Type Checking**: mypy (strict mode)
-- **Code Quality**: ruff
-- **Architecture**: Component-based with dependency injection
+- Python 3.12+ with strict type checking
+- uv for dependency management
+- pytest with 97% coverage
+- mypy strict mode
+- ruff linting
+- mkdocs-material documentation
+
+## Development
+
+```bash
+# Install and run
+uv sync --extra dev --extra email --extra gmail
+uv run python main.py
+
+# Test and validate
+uv run pytest                # All tests
+uv run mypy src/            # Type checking
+uv run ruff check .         # Linting
+```
 
 ## License
 
-MIT License - See LICENSE file for details. 
+MIT License

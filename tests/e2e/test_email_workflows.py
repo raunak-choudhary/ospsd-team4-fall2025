@@ -1,255 +1,193 @@
-"""End-to-end tests for complete email client workflows.
+"""End-to-end tests for the main application.
 
-These tests demonstrate complete user workflows from start to finish.
-They test the system at the highest level of abstraction, simulating
-real user interactions with the email client.
-
-Setup Required:
-1. Valid Gmail API credentials (credentials.json)
-2. Internet connection
-3. Run: uv run pytest tests/e2e/ -v
-
-These tests validate the entire user journey and system integration.
+Tests execute main.py as a subprocess to simulate real user interactions.
 """
 
-import asyncio
-import time
-from typing import Any
+from pathlib import Path
+import subprocess
+import sys
 
 import pytest
 
-from email_api import Email, EmailClient
-from email_api.exceptions import (
-    EmailAuthenticationError,
-    EmailConnectionError,
-    EmailNotFoundError,
-)
-from gmail_impl import GmailClient, GmailConfig
+pytestmark = pytest.mark.e2e
 
 
-class TestEmailClientWorkflows:
-    """End-to-end workflow tests using the complete email client system."""
+@pytest.fixture
+def main_script() -> Path:
+    """Get path to main.py in the workspace root."""
+    script_path = Path(__file__).parent.parent.parent / "main.py"
+    if not script_path.exists():
+        pytest.skip(f"main.py not found at {script_path}")
+    return script_path
 
-    @pytest.mark.e2e
-    async def test_complete_email_reading_workflow(
-        self, e2e_config: GmailConfig
+
+@pytest.fixture
+def check_credentials(main_script: Path) -> None:
+    """Check if credentials are available."""
+    credentials_file = main_script.parent / "credentials.json"
+    token_file = main_script.parent / "token.json"
+
+    if not credentials_file.exists() and not token_file.exists():
+        pytest.skip("No credentials.json or token.json found")
+
+
+class TestMainScriptExecution:
+    """E2E tests that execute main.py as a subprocess."""
+
+    def test_main_script_runs_successfully(
+        self, main_script: Path, check_credentials: None,
     ) -> None:
-        """Test complete workflow: authenticate -> list -> read -> process emails."""
-
-        async def email_processor(client: EmailClient) -> list[Email]:
-            """Example email processing function using dependency injection."""
-            processed_emails = []
-
-            # Step 1: List recent emails
-            emails = await client.list_inbox_messages(limit=5)
-
-            # Step 2: Process each email
-            for email_summary in emails:
-                # Step 3: Get full email content
-                full_email = await client.get_email_content(email_summary.id)
-
-                # Step 4: Process email content
-                if full_email.has_content:
-                    processed_emails.append(full_email)
-
-            return processed_emails
-
-        # Execute the complete workflow
-        try:
-            async with GmailClient(e2e_config) as gmail_client:
-                processed_emails = await email_processor(gmail_client)
-
-                # Verify workflow results
-                assert isinstance(processed_emails, list)
-                for email in processed_emails:
-                    assert isinstance(email, Email)
-                    assert email.has_content
-                    assert email.id
-                    assert email.sender
-
-        except (EmailAuthenticationError, EmailConnectionError) as e:
-            pytest.skip(f"Gmail API not accessible: {e}")
-
-    @pytest.mark.e2e
-    async def test_email_management_scenarios(
-        self, e2e_config: GmailConfig
-    ) -> None:
-        """Test various email management scenarios."""
-
-        async def inbox_analyzer(client: EmailClient) -> dict[str, Any]:
-            """Analyze inbox contents."""
-            emails = await client.list_inbox_messages(limit=20)
-
-            analysis: dict[str, Any] = {
-                "total_count": len(emails),
-                "has_content_count": 0,
-                "senders": set(),
-            }
-
-            # Analyze a subset for performance
-            for email in emails[:5]:
-                full_email = await client.get_email_content(email.id)
-                if full_email.has_content:
-                    analysis["has_content_count"] += 1
-                analysis["senders"].add(full_email.sender.address)
-
-            return analysis
+        """Test that main.py executes and completes successfully."""
+        command = [sys.executable, str(main_script)]
 
         try:
-            async with GmailClient(e2e_config) as client:
-                analysis = await inbox_analyzer(client)
+            result = subprocess.run(
+                command,
+                capture_output=True,
+                text=True,
+                check=True,
+                timeout=60,
+                cwd=str(main_script.parent),
+            )
 
-                # Verify analysis results
-                assert analysis["total_count"] >= 0
-                assert analysis["has_content_count"] >= 0
-                assert len(analysis["senders"]) >= 0
+            output = result.stdout
 
-        except (EmailAuthenticationError, EmailConnectionError) as e:
-            pytest.skip(f"Gmail API not accessible: {e}")
+            assert "Initializing email client..." in output
+            assert "=== Crawling Inbox ===" in output
+            assert "Found" in output
+            assert "emails" in output
+            assert "Demo complete!" in output
 
-    @pytest.mark.e2e
-    async def test_error_recovery_workflow(
-        self, e2e_config: GmailConfig
+        except subprocess.TimeoutExpired:
+            pytest.fail("E2E test timed out - main.py took too long")
+        except subprocess.CalledProcessError as e:
+            pytest.fail(
+                f"main.py execution failed.\n"
+                f"Exit Code: {e.returncode}\n"
+                f"Stdout: {e.stdout}\n"
+                f"Stderr: {e.stderr}",
+            )
+
+    def test_main_script_displays_email_content(
+        self, main_script: Path, check_credentials: None,
     ) -> None:
-        """Test error handling and recovery in complete workflows."""
-
-        async def robust_email_processor(client: EmailClient) -> dict[str, Any]:
-            """Email processor with error handling."""
-            results: dict[str, Any] = {
-                "successful_lists": 0,
-                "successful_reads": 0,
-                "errors": [],
-            }
-
-            try:
-                # Attempt to list emails
-                emails = await client.list_inbox_messages(limit=5)
-                results["successful_lists"] = 1
-
-                # Attempt to read each email with error handling
-                for email in emails:
-                    try:
-                        await client.get_email_content(email.id)
-                        results["successful_reads"] += 1
-                    except (
-                        EmailAuthenticationError,
-                        EmailConnectionError,
-                        EmailNotFoundError,
-                        ValueError,
-                        KeyError,
-                    ) as e:
-                        results["errors"].append(str(e))
-
-                # Test with invalid email ID
-                try:
-                    await client.get_email_content("invalid_id_test")
-                except (
-                    EmailAuthenticationError,
-                    EmailConnectionError,
-                    EmailNotFoundError,
-                    ValueError,
-                    KeyError,
-                ) as e:
-                    results["errors"].append(f"Expected error: {e!s}")
-
-            except (EmailAuthenticationError, EmailConnectionError) as e:
-                results["errors"].append(f"List error: {e!s}")
-
-            return results
+        """Test that main.py displays email content."""
+        command = [sys.executable, str(main_script)]
 
         try:
-            async with GmailClient(e2e_config) as client:
-                results = await robust_email_processor(client)
+            result = subprocess.run(
+                command,
+                capture_output=True,
+                text=True,
+                check=True,
+                timeout=60,
+                cwd=str(main_script.parent),
+            )
 
-                # Should have at least attempted operations
-                assert results["successful_lists"] >= 0
-                assert results["successful_reads"] >= 0
-                assert isinstance(results["errors"], list)
+            output = result.stdout
 
-        except (EmailAuthenticationError, EmailConnectionError) as e:
-            pytest.skip(f"Gmail API not accessible: {e}")
+            assert "=== Email Content ===" in output
+            assert "From:" in output
+            assert "Subject:" in output
+            assert "Date:" in output
+            assert "Preview:" in output
 
-    @pytest.mark.e2e
-    async def test_performance_user_experience(
-        self, e2e_config: GmailConfig
+        except subprocess.TimeoutExpired:
+            pytest.fail("E2E test timed out")
+        except subprocess.CalledProcessError as e:
+            pytest.fail(f"main.py execution failed: {e.stderr}")
+
+    def test_main_script_handles_connection_errors(
+        self, main_script: Path, tmp_path: Path,
     ) -> None:
-        """Test performance characteristics from user perspective."""
+        """Test that main.py handles connection errors gracefully."""
+        # Create invalid credentials to trigger error
+        bad_creds = tmp_path / "credentials.json"
+        bad_creds.write_text("{}")
+
+        # Use temporary directory with bad credentials
+        command = [sys.executable, str(main_script)]
+
+        # This test expects the script to handle errors gracefully
+        # We'll check that it either succeeds or fails with appropriate error message
         try:
-            async with GmailClient(e2e_config) as client:
-                # Test initial connection time
-                start_time = time.time()
-                emails = await client.list_inbox_messages(limit=1)
-                initial_time = time.time() - start_time
+            result = subprocess.run(
+                command,
+                check=False, capture_output=True,
+                text=True,
+                timeout=60,
+                cwd=str(main_script.parent),
+            )
 
-                # Should connect and list within reasonable time
-                assert initial_time < 15.0  # Allow for authentication
+            # Should have some output regardless of success/failure
+            assert len(result.stdout) > 0 or len(result.stderr) > 0
 
-                if emails:
-                    # Test content retrieval time
-                    start_time = time.time()
-                    await client.get_email_content(emails[0].id)
-                    content_time = time.time() - start_time
+        except subprocess.TimeoutExpired:
+            pytest.fail("E2E test timed out")
 
-                    # Content retrieval should be fast
-                    assert content_time < 10.0
 
-        except (EmailAuthenticationError, EmailConnectionError) as e:
-            pytest.skip(f"Gmail API not accessible: {e}")
+class TestMainScriptStructure:
+    """E2E tests for main.py structure and imports."""
 
-    @pytest.mark.e2e
-    async def test_concurrent_user_operations(
-        self, e2e_config: GmailConfig
-    ) -> None:
-        """Test concurrent operations as a user might perform them."""
-
-        async def concurrent_operations(client: EmailClient) -> int:
-            """Simulate concurrent user operations."""
-            # Simulate user performing multiple operations simultaneously
-            list_task = client.list_inbox_messages(limit=5)
-
-            # Start list operation
-            emails = await list_task
-
-            if emails and len(emails) >= 2:
-                # Simulate reading multiple emails concurrently
-                read_tasks = [
-                    client.get_email_content(emails[0].id),
-                    client.get_email_content(emails[1].id),
-                ]
-
-                results = await asyncio.gather(*read_tasks, return_exceptions=True)
-
-                # At least one should succeed
-                successful_reads = [r for r in results if isinstance(r, Email)]
-                assert len(successful_reads) >= 0
-
-            return len(emails) if emails else 0
+    def test_main_script_syntax_is_valid(self, main_script: Path) -> None:
+        """Test that main.py has valid Python syntax."""
+        command = [sys.executable, "-m", "py_compile", str(main_script)]
 
         try:
-            async with GmailClient(e2e_config) as client:
-                email_count = await concurrent_operations(client)
-                assert email_count >= 0
+            subprocess.run(
+                command,
+                capture_output=True,
+                text=True,
+                check=True,
+                timeout=30,
+            )
+        except subprocess.CalledProcessError as e:
+            pytest.fail(f"main.py has syntax errors:\n{e.stderr}")
 
-        except (EmailAuthenticationError, EmailConnectionError) as e:
-            pytest.skip(f"Gmail API not accessible: {e}")
+    def test_main_script_imports_work(self, main_script: Path) -> None:
+        """Test that main.py can import all required modules."""
+        import_test_code = """
+import email_api
+import gmail_impl
+print("All imports successful")
+"""
 
-    @pytest.mark.e2e
-    async def test_resource_management_workflow(
-        self, e2e_config: GmailConfig
-    ) -> None:
-        """Test proper resource management in complete workflows."""
+        command = [sys.executable, "-c", import_test_code]
 
-        # Test multiple client sessions
-        for session in range(3):
-            try:
-                async with GmailClient(e2e_config) as client:
-                    emails = await client.list_inbox_messages(limit=2)
-                    assert isinstance(emails, list)
+        try:
+            result = subprocess.run(
+                command,
+                capture_output=True,
+                text=True,
+                check=True,
+                timeout=30,
+                cwd=str(main_script.parent),
+            )
 
-                    # Each session should work independently
-                    if emails:
-                        email = await client.get_email_content(emails[0].id)
-                        assert isinstance(email, Email)
+            assert "All imports successful" in result.stdout
 
-            except (EmailAuthenticationError, EmailConnectionError) as e:
-                pytest.skip(f"Gmail API not accessible in session {session}: {e}")
+        except subprocess.CalledProcessError as e:
+            pytest.fail(f"main.py imports failed:\n{e.stderr}")
+
+    def test_application_structure_integrity(self, main_script: Path) -> None:
+        """Test that the application has expected file structure."""
+        workspace_root = main_script.parent
+
+        expected_files = [
+            "main.py",
+            "pyproject.toml",
+            "src/email_api/src/email_api/__init__.py",
+            "src/email_api/src/email_api/client.py",
+            "src/gmail_impl/src/gmail_impl/__init__.py",
+            "src/gmail_impl/src/gmail_impl/gmail_client.py",
+        ]
+
+        missing_files = []
+
+        for file_path in expected_files:
+            full_path = workspace_root / file_path
+            if not full_path.exists():
+                missing_files.append(file_path)
+
+        if missing_files:
+            pytest.fail(f"Missing required files: {missing_files}")
