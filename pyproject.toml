@@ -11,7 +11,11 @@ version = "0.1.0"
 description = "OSPSD TA Task - Email client workspace"
 readme = "README.md"
 requires-python = ">=3.12"
-dependencies = []
+dependencies = [
+    "fastapi>=0.118.0",
+    "httpx>=0.28.1",
+    "uvicorn>=0.37.0",
+]
 
 [tool.uv.sources]
 # Workspace component sources
@@ -35,6 +39,17 @@ email = [
 ]
 gmail = [
     "gmail-impl>=0.1.0",
+]
+
+[dependency-groups]
+dev = [
+    "anyio>=4.11.0",
+    "mypy>=1.17.1",
+    "openapi-python-client>=0.26.1",
+    "pytest>=8.4.1",
+    "pytest-asyncio>=1.2.0",
+    "pytest-cov>=6.2.1",
+    "ruff>=0.12.7",
 ]
 
 # Shared tool configuration for all workspace members
