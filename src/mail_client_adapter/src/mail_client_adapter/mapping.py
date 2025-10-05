@@ -1,6 +1,7 @@
 from typing import Any
 import email_api
 
+
 def to_email_model(payload: Any) -> email_api.Email:
     """Convert service JSON payload to email_api.Email object."""
     return email_api.Email(
@@ -12,6 +13,7 @@ def to_email_model(payload: Any) -> email_api.Email:
         date_received=payload.get("date_received", "1970-01-01T00:00:00Z"),
         body=str(payload.get("body", "")),
     )
+
 
 def to_message_id(message_id: str) -> str:
     """Convert generic ID to service-compatible message ID string."""

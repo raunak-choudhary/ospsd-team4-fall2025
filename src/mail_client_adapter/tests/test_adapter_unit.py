@@ -19,6 +19,7 @@ def test_list_messages_unit(monkeypatch):
 
     # Patch the adapter’s imported API function (correct path)
     import mail_client_adapter.src.mail_client_adapter.adapter as adapter_module
+
     monkeypatch.setattr(
         adapter_module.api_list_messages,
         "sync",
@@ -35,4 +36,3 @@ def test_list_messages_unit(monkeypatch):
     assert len(emails) == 1
     assert isinstance(emails[0], email_api.Email)
     assert emails[0].subject == "Hello"
-

@@ -1,6 +1,7 @@
+from collections.abc import Iterator
 from typing import Any
 
-# Import generated HTTP client and API functions
+import email_api
 from mail_client_service_client import Client as GeneratedClient
 from mail_client_service_client.api.messages import (
     delete_message_messages_message_id_delete as api_delete_message,
@@ -8,13 +9,10 @@ from mail_client_service_client.api.messages import (
     list_messages_messages_get as api_list_messages,
     mark_as_read_messages_message_id_mark_as_read_post as api_mark_as_read,
 )
-
-import email_api
-
 from .mapping import to_email_model, to_message_id
 
 
-class ServiceBackedClient(email_api.Client):  # type: ignore[misc]
+class ServiceBackedClient(email_api.Client):
     """Implements email_api.Client using the generated HTTP client.
     Consumers don't know if they're using a local or remote service.
     """
@@ -29,18 +27,27 @@ class ServiceBackedClient(email_api.Client):  # type: ignore[misc]
 
     def get_message(self, message_id: str) -> email_api.Email:
         """Fetch a specific message by ID."""
-        resp = api_get_message.sync(client=self._client, message_id=to_message_id(message_id))
+        resp = api_get_message.sync(
+            client=self._client,
+            message_id=to_message_id(message_id),
+        )
         return to_email_model(resp)
 
     def mark_as_read(self, message_id: str) -> dict[str, Any]:
         """Mark message as read on the server."""
-        return api_mark_as_read.sync(client=self._client, message_id=to_message_id(message_id))
+        return api_mark_as_read.sync(
+            client=self._client,
+            message_id=to_message_id(message_id),
+        )
 
     def delete_message(self, message_id: str) -> dict[str, Any]:
         """Delete message by ID from the server."""
-        return api_delete_message.sync(client=self._client, message_id=to_message_id(message_id))
-    
-    def get_messages(self, limit: int | None = None):
-        """Wrapper for compatibility with abstract Client interface."""
-        return self.list_messages()
+        return api_delete_message.sync(
+            client=self._client,
+            message_id=to_message_id(message_id),
+        )
 
+    def get_messages(self, limit: int | None = None) -> Iterator[email_api.Email]:
+        """Wrapper for compatibility with abstract Client interface."""
+        for msg in self.list_messages():
+            yield msg
