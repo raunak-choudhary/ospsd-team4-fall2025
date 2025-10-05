@@ -157,7 +157,8 @@ class TestClientInjection:
     """Test client dependency injection pattern."""
 
     def test_get_client_returns_injected_implementation(
-        self, monkeypatch: pytest.MonkeyPatch,
+        self,
+        monkeypatch: pytest.MonkeyPatch,
     ) -> None:
         """Test that get_client returns the injected client implementation."""
         mock_client = Mock(spec=Client)
