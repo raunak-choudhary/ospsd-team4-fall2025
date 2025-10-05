@@ -1,0 +1,4 @@
+# .ruff.toml
+extend-exclude = [
+    "clients/python/mail_client_service_client",
+]

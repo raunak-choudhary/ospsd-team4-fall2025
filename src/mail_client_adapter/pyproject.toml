@@ -1,0 +1,20 @@
+[project]
+name = "mail_client_adapter"
+version = "0.1.0"
+description = "Adapter implementing email_api via the generated OpenAPI client"
+requires-python = ">=3.12"
+dependencies = [
+    "httpx"
+]
+
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.uv]
+dev-dependencies = [
+    "pytest",
+    "pytest-cov",
+    "mypy",
+    "ruff"
+]
