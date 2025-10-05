@@ -14,7 +14,7 @@ from .mapping import to_email_model, to_message_id
 
 class ServiceBackedClient(email_api.Client):
     """Implements email_api.Client using the generated HTTP client.
-    Consumers don't know if they're using a local or remote service.
+    Consumers don’t know if they’re using a local or remote service.
     """
 
     def __init__(self, base_url: str) -> None:

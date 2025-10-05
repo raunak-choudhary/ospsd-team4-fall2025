@@ -127,6 +127,8 @@ addopts = [
     "--import-mode=importlib",
 ]
 testpaths = ["src/*/tests", "tests"]
+pythonpath = ["clients/python"]
+
 markers = [
     "unit: marks tests as unit tests",
     "integration: marks tests as integration tests",

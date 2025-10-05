@@ -1,1 +1,1 @@
-"""Unit tests for the gmail_impl package."""
+"""Unit tests for gmail_impl package."""
