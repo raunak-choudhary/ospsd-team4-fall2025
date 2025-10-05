@@ -1,13 +1,13 @@
-"""Gmail implementation of the Client protocol.
+"""Register GmailClient as the default email_api client implementation."""
 
-This component provides a concrete implementation of the Client protocol
-using the Gmail API with OAuth2 authentication.
-"""
-
-import email_api
+from email_api import register_client_factory
 from gmail_impl.gmail_client import GmailClient
 
-__all__ = ["GmailClient"]
+# Register GmailClient so that email_api.get_client() uses it by default
+register_client_factory(GmailClient)
 
-# Dependency injection: Replace email_api.get_client with our implementation
-email_api.get_client = lambda: GmailClient()
+# Expose for direct test imports
+gmail_client = GmailClient
+GmailClient = GmailClient
+
+__all__ = ["GmailClient", "gmail_client"]
