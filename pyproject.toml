@@ -19,6 +19,9 @@ dependencies = [
     "fastapi>=0.118.0",
     "httpx>=0.28.1",
     "uvicorn>=0.37.0",
+    "google-auth>=2.25.0",
+    "google-auth-oauthlib>=1.1.0",
+    "google-api-python-client>=2.100.0"
 ]
 
 
@@ -27,6 +30,7 @@ dependencies = [
 email-api = { workspace = true }
 gmail-impl = { workspace = true }
 mail-client-service = { workspace = true }
+mail-client-adapter = { workspace = true }
 
 [project.optional-dependencies]
 # Shared development tools used across all workspace components
