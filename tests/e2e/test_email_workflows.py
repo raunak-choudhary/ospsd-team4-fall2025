@@ -35,7 +35,9 @@ class TestMainScriptExecution:
     """E2E tests that execute main.py as a subprocess."""
 
     def test_main_script_runs_successfully(
-        self, main_script: Path, check_credentials: None,
+        self,
+        main_script: Path,
+        check_credentials: None,
     ) -> None:
         """Test that main.py executes and completes successfully."""
         command = [sys.executable, str(main_script)]
@@ -69,7 +71,9 @@ class TestMainScriptExecution:
             )
 
     def test_main_script_displays_email_content(
-        self, main_script: Path, check_credentials: None,
+        self,
+        main_script: Path,
+        check_credentials: None,
     ) -> None:
         """Test that main.py displays email content."""
         command = [sys.executable, str(main_script)]
@@ -98,7 +102,9 @@ class TestMainScriptExecution:
             pytest.fail(f"main.py execution failed: {e.stderr}")
 
     def test_main_script_handles_connection_errors(
-        self, main_script: Path, tmp_path: Path,
+        self,
+        main_script: Path,
+        tmp_path: Path,
     ) -> None:
         """Test that main.py handles connection errors gracefully."""
         # Create invalid credentials to trigger error
@@ -113,7 +119,8 @@ class TestMainScriptExecution:
         try:
             result = subprocess.run(
                 command,
-                check=False, capture_output=True,
+                check=False,
+                capture_output=True,
                 text=True,
                 timeout=60,
                 cwd=str(main_script.parent),

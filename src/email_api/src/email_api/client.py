@@ -4,20 +4,23 @@ from abc import ABC, abstractmethod
 from collections.abc import Iterator
 from dataclasses import dataclass
 from datetime import datetime
+from typing import Optional
 
+
+# ============================
+# Data Models
+# ============================
 
 @dataclass(frozen=True)
 class EmailAddress:
     """Represents an email address with optional display name."""
 
     address: str
-    name: str | None = None
+    name: Optional[str] = None
 
     def __str__(self) -> str:
         """Return formatted email address."""
-        if self.name:
-            return f"{self.name} <{self.address}>"
-        return self.address
+        return f"{self.name} <{self.address}>" if self.name else self.address
 
 
 @dataclass(frozen=True)
@@ -32,6 +35,10 @@ class Email:
     date_received: datetime
     body: str
 
+
+# ============================
+# Abstract Client
+# ============================
 
 class Client(ABC):
     """Mail client abstract base class for fetching messages."""
@@ -50,17 +57,36 @@ class Client(ABC):
         raise NotImplementedError
 
 
+# ============================
+# Dummy Client (Fallback)
+# ============================
+
+class DummyClient(Client):
+    """Fallback client used when no real implementation is injected."""
+
+    def get_messages(self, limit: int | None = None) -> Iterator[Email]:
+        """Return an empty iterator."""
+        return iter([])
+
+
+# ============================
+# Client Factory / Registration
+# ============================
+
+_client_factory: Optional[type[Client]] = None
+
+
+def register_client_factory(factory: type[Client]) -> None:
+    """Allow implementations (like gmail_impl) to register their client."""
+    global _client_factory
+    _client_factory = factory
+
+
 def get_client() -> Client:
-    """Return an instance of a Mail Client.
+    """Return an instance of the registered mail client.
 
-    This function should be replaced by implementation packages.
-    Import an implementation package (e.g., gmail_impl) to inject
-    the concrete implementation.
-
-    Returns:
-        Client instance from the injected implementation
-
-    Raises:
-        NotImplementedError: If no implementation has been imported
+    If no implementation package has registered a client, return DummyClient.
     """
-    raise NotImplementedError
+    if _client_factory is not None:
+        return _client_factory()  # type: ignore[call-arg]
+    return DummyClient()
