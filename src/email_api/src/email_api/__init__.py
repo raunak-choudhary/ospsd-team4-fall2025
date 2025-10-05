@@ -19,7 +19,8 @@ Example usage:
             print(f"From: {email.sender}")
 """
 
-from email_api.client import Client, Email, EmailAddress, get_client
+from .client import Client, Email, EmailAddress, get_client
+
 
 __all__ = [
     "Client",

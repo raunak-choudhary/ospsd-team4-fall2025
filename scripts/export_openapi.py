@@ -1,8 +1,14 @@
 """Export the FastAPI OpenAPI schema to clients/specs/openapi.json."""
 from __future__ import annotations
-import json, logging, pathlib
+
+import json
+import logging
+import pathlib
+
 from fastapi.openapi.utils import get_openapi
+
 from mail_client_service.app import app
+
 logger = logging.getLogger(__name__)
 def main() -> None:
     spec = get_openapi(title=app.title, version=app.version, routes=app.routes)
