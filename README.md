@@ -268,11 +268,83 @@ See [Getting Started - CI/CD Setup](docs/getting-started/index.md#cicd-setup-cir
 - **[Testing Strategy](docs/architecture/testing.md)**: Comprehensive testing approach
 - **[API Reference](docs/reference/)**: Component APIs and usage examples
 
+🐳 Extra Credit #1 — Containerization with Docker
+=================================================
+
+This project includes a **Dockerized version** of the Mail Client Service, allowing it to be built and run in an isolated environment using containers.
+
+🚀 Steps to Build the Docker Image
+----------------------------------
+
+To create a Docker image for the project, run the following command from the root directory:
+
+`   docker build -t mail-service .   `
+
+This command builds the image using the provided Dockerfile.It installs dependencies using uv and exposes the FastAPI service on port 8000.
+
+▶️ Running the Container
+------------------------
+
+Once the image has been built successfully, you can run the service with:
+
+`   docker run -p 8000:8000 mail-service   `
+
+This will start a **FastAPI server** and map port 8000 inside the container to your local machine.
+
+🌐 Accessing the API
+--------------------
+
+After the container is running, open your browser and visit:
+
+`   http://localhost:8000/docs   `
+
+You’ll see the interactive **Swagger UI** for your Mail Client API.This confirms that the API is successfully containerized and running locally.
+
+🧠 Summary
+----------
+
+✅ Builds and runs inside a Docker container✅ Uses **FastAPI** and **Uvicorn** for serving routes✅ Exposes port **8000** for external access✅ Ensures consistent environment across all systems
+
 Build and serve documentation locally:
 ```bash
 uv run mkdocs serve
 ```
 Open http://127.0.0.1:8000 in your browser.
+
+☁️ Extra Credit #2 — Deploying the Mail Client API Online
+=========================================================
+
+This extra credit involves deploying the **Mail Client API** online so it can be accessed publicly.The service is hosted using **Render**, a free platform for deploying containerized applications.
+
+🌍 Live Deployment
+------------------
+
+✅ The live, publicly accessible API is hosted at:
+
+👉 [**https://ospsd-team4-fall2025.onrender.com/docs**](https://ospsd-team4-fall2025.onrender.com/docs)
+
+You can visit this URL to explore the interactive **Swagger UI** and test the available endpoints directly.
+
+⚙️ Deployment Steps
+-------------------
+
+1.  extra-credit-hw1
+    
+2.  **Connected Render** to the GitHub repository.
+    
+3.  Selected **Docker** as the deployment method (Render automatically detected the Dockerfile).
+    
+4.  uvicorn src.mail\_client\_service.src.mail\_client\_service.app:app --host 0.0.0.0 --port 8000
+    
+5.  Exposed port **8000**, which Render used as the public service port.
+    
+6.  Waited for the deployment to complete — once done, Render provided a live URL.
+    
+
+🧠 Summary
+----------
+
+✅ Service containerized and deployed via **Docker + Render**✅ Accessible publicly via Render URL✅ /docs endpoint provides full API testing✅ Demonstrates understanding of cloud deployment workflow
 
 ## Design Principles
 
