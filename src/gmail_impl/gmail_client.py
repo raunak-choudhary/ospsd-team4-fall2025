@@ -1,4 +1,7 @@
-import base64, contextlib, os, re
+import base64
+import contextlib
+import os
+import re
 from collections.abc import Iterator
 from datetime import UTC, datetime
 from email.utils import parsedate_to_datetime
@@ -92,9 +95,7 @@ class GmailClient(Client):
             if page_token:
                 request_params["pageToken"] = page_token
 
-            results = (
-                self._service.users().messages().list(**request_params).execute()
-            )
+            results = self._service.users().messages().list(**request_params).execute()
             messages = results.get("messages", [])
             if not messages:
                 break
@@ -119,7 +120,12 @@ class GmailClient(Client):
     def _parse_message(self, message: dict[str, Any]) -> Email:
         payload = message.get("payload", {})
         headers = payload.get("headers", [])
-        subject, sender_email, sender_name, date_str = "", "unknown@unknown.com", None, ""
+        subject, sender_email, sender_name, date_str = (
+            "",
+            "unknown@unknown.com",
+            None,
+            "",
+        )
         recipient_addresses: list[EmailAddress] = []
 
         for header in headers:
