@@ -11,14 +11,21 @@
           "messages"
         ],
         "summary": "List Messages",
-        "description": "Return a list of all messages.",
+        "description": "Return a list of message summaries.\n\nPrefer `list_messages()` if available; otherwise fall back to `get_messages()`.",
         "operationId": "list_messages_messages_get",
         "responses": {
           "200": {
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "items": {
+                    "additionalProperties": true,
+                    "type": "object"
+                  },
+                  "type": "array",
+                  "title": "Response List Messages Messages Get"
+                }
               }
             }
           }
@@ -31,7 +38,7 @@
           "messages"
         ],
         "summary": "Get Message",
-        "description": "Return details for a specific message.",
+        "description": "Return full detail for a single message.",
         "operationId": "get_message_messages__message_id__get",
         "parameters": [
           {
@@ -49,7 +56,11 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "title": "Response Get Message Messages  Message Id  Get"
+                }
               }
             }
           },
@@ -88,7 +99,11 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "title": "Response Delete Message Messages  Message Id  Delete"
+                }
               }
             }
           },
@@ -129,7 +144,11 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "title": "Response Mark As Read Messages  Message Id  Mark As Read Post"
+                }
               }
             }
           },
