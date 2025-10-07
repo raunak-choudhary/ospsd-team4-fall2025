@@ -56,11 +56,7 @@ class GmailClient(Client):
             or os.getenv("GMAIL_CREDENTIALS_PATH")
             or "credentials.json"
         )
-        self._token_file = (
-            token_file
-            or os.getenv("GMAIL_TOKEN_PATH")
-            or "token.json"
-        )
+        self._token_file = token_file or os.getenv("GMAIL_TOKEN_PATH") or "token.json"
         self._service: Any = None
 
     def _authenticate(self) -> Credentials:
@@ -80,7 +76,8 @@ class GmailClient(Client):
         if token_path.exists():
             try:
                 creds = Credentials.from_authorized_user_file(  # type: ignore[no-untyped-call]
-                    str(token_path), self.SCOPES,
+                    str(token_path),
+                    self.SCOPES,
                 )
             except (OSError, ValueError, KeyError):
                 # If token loading fails, delete and create new credentials
@@ -107,7 +104,8 @@ class GmailClient(Client):
 
                 try:
                     flow = InstalledAppFlow.from_client_secrets_file(
-                        str(credentials_path), self.SCOPES,
+                        str(credentials_path),
+                        self.SCOPES,
                     )
                     creds = flow.run_local_server(port=0)
                 except Exception as e:
@@ -194,10 +192,7 @@ class GmailClient(Client):
                     request_params["pageToken"] = page_token
 
                 results = (
-                    self._service.users()
-                    .messages()
-                    .list(**request_params)
-                    .execute()
+                    self._service.users().messages().list(**request_params).execute()
                 )
 
                 messages = results.get("messages", [])
