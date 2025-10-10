@@ -1,0 +1,293 @@
+Folder PATH listing for volume Windows
+Volume serial number is 7275-0C8A
+C:.
+├───.circleci
+├───.github
+│   └───ISSUE_TEMPLATE
+├───.mypy_cache
+│   └───3.12
+│       ├───annotated_types
+│       ├───anyio
+│       │   ├───abc
+│       │   ├───streams
+│       │   └───_core
+│       ├───asyncio
+│       ├───attr
+│       ├───attrs
+│       ├───certifi
+│       ├───click
+│       ├───collections
+│       ├───concurrent
+│       │   └───futures
+│       ├───ctypes
+│       ├───email
+│       ├───email_api
+│       ├───fastapi
+│       │   ├───dependencies
+│       │   ├───middleware
+│       │   ├───openapi
+│       │   └───security
+│       ├───gmail_impl
+│       ├───google
+│       │   ├───auth
+│       │   │   ├───crypt
+│       │   │   └───transport
+│       │   └───oauth2
+│       ├───h11
+│       ├───html
+│       ├───http
+│       ├───httpcore
+│       │   ├───_async
+│       │   ├───_backends
+│       │   └───_sync
+│       ├───httpx
+│       │   └───_transports
+│       ├───idna
+│       ├───importlib
+│       │   ├───metadata
+│       │   └───resources
+│       ├───iniconfig
+│       ├───json
+│       ├───logging
+│       ├───mail_client_service
+│       │   └───routes
+│       ├───mail_client_service_client
+│       │   ├───api
+│       │   │   └───messages
+│       │   └───models
+│       ├───markdown_it
+│       │   ├───common
+│       │   ├───helpers
+│       │   ├───presets
+│       │   ├───rules_block
+│       │   ├───rules_core
+│       │   └───rules_inline
+│       ├───mdurl
+│       ├───multiprocessing
+│       ├───os
+│       ├───packaging
+│       ├───pathlib
+│       ├───pluggy
+│       ├───pydantic
+│       │   ├───deprecated
+│       │   ├───plugin
+│       │   ├───v1
+│       │   └───_internal
+│       ├───pydantic_core
+│       ├───pytest
+│       ├───rich
+│       ├───rsa
+│       ├───scripts
+│       ├───sniffio
+│       ├───src
+│       │   ├───email_api
+│       │   │   └───tests
+│       │   ├───gmail_impl
+│       │   │   ├───examples
+│       │   │   └───tests
+│       │   └───mail_client_service
+│       ├───starlette
+│       │   └───middleware
+│       ├───string
+│       ├───sys
+│       ├───tests
+│       │   ├───e2e
+│       │   └───integration
+│       ├───typing_inspection
+│       ├───unittest
+│       ├───urllib
+│       ├───urllib3
+│       │   ├───contrib
+│       │   ├───http2
+│       │   └───util
+│       ├───wsgiref
+│       ├───zipfile
+│       │   └───_path
+│       ├───zoneinfo
+│       ├───_pytest
+│       │   ├───assertion
+│       │   ├───config
+│       │   ├───mark
+│       │   ├───_code
+│       │   └───_io
+│       └───_typeshed
+├───.pytest_cache
+│   └───v
+│       └───cache
+├───.ruff_cache
+│   └───0.12.7
+├───.venv
+│   ├───Lib
+│   │   └───site-packages
+│   │       ├───annotated_types
+│   │       ├───annotated_types-0.7.0.dist-info
+│   │       │   └───licenses
+│   │       ├───anyio
+│   │       │   ├───abc
+│   │       │   ├───streams
+│   │       │   ├───_backends
+│   │       │   └───_core
+│   │       ├───anyio-4.11.0.dist-info
+│   │       │   └───licenses
+│   │       ├───attr
+│   │       ├───attrs
+│   │       ├───attrs-25.3.0.dist-info
+│   │       │   └───licenses
+│   │       ├───certifi
+│   │       ├───certifi-2025.8.3.dist-info
+│   │       │   └───licenses
+│   │       ├───click
+│   │       ├───click-8.3.0.dist-info
+│   │       │   └───licenses
+│   │       ├───colorama
+│   │       │   └───tests
+│   │       ├───colorama-0.4.6.dist-info
+│   │       │   └───licenses
+│   │       ├───coverage
+│   │       │   └───htmlfiles
+│   │       ├───coverage-7.10.2.dist-info
+│   │       │   └───licenses
+│   │       ├───fastapi
+│   │       │   ├───dependencies
+│   │       │   ├───middleware
+│   │       │   ├───openapi
+│   │       │   └───security
+│   │       ├───fastapi-0.118.0.dist-info
+│   │       │   └───licenses
+│   │       ├───h11
+│   │       ├───h11-0.16.0.dist-info
+│   │       │   └───licenses
+│   │       ├───httpcore
+│   │       │   ├───_async
+│   │       │   ├───_backends
+│   │       │   └───_sync
+│   │       ├───httpcore-1.0.9.dist-info
+│   │       │   └───licenses
+│   │       ├───httpx
+│   │       │   └───_transports
+│   │       ├───httpx-0.28.1.dist-info
+│   │       │   └───licenses
+│   │       ├───idna
+│   │       ├───idna-3.10.dist-info
+│   │       ├───iniconfig
+│   │       ├───iniconfig-2.1.0.dist-info
+│   │       │   └───licenses
+│   │       ├───packaging
+│   │       │   └───licenses
+│   │       ├───packaging-25.0.dist-info
+│   │       │   └───licenses
+│   │       ├───pluggy
+│   │       ├───pluggy-1.6.0.dist-info
+│   │       │   └───licenses
+│   │       ├───pydantic
+│   │       │   ├───deprecated
+│   │       │   ├───experimental
+│   │       │   ├───plugin
+│   │       │   ├───v1
+│   │       │   └───_internal
+│   │       ├───pydantic-2.11.10.dist-info
+│   │       │   └───licenses
+│   │       ├───pydantic_core
+│   │       ├───pydantic_core-2.33.2.dist-info
+│   │       │   └───licenses
+│   │       ├───pygments
+│   │       │   ├───filters
+│   │       │   ├───formatters
+│   │       │   ├───lexers
+│   │       │   └───styles
+│   │       ├───pygments-2.19.2.dist-info
+│   │       │   └───licenses
+│   │       ├───pytest
+│   │       ├───pytest-8.4.1.dist-info
+│   │       │   └───licenses
+│   │       ├───pytest_cov
+│   │       ├───pytest_cov-6.2.1.dist-info
+│   │       │   └───licenses
+│   │       ├───ruff
+│   │       ├───ruff-0.12.7.dist-info
+│   │       │   └───licenses
+│   │       ├───sniffio
+│   │       │   └───_tests
+│   │       ├───sniffio-1.3.1.dist-info
+│   │       ├───starlette
+│   │       │   └───middleware
+│   │       ├───starlette-0.48.0.dist-info
+│   │       │   └───licenses
+│   │       ├───typing_extensions-4.14.1.dist-info
+│   │       │   └───licenses
+│   │       ├───typing_inspection
+│   │       ├───typing_inspection-0.4.2.dist-info
+│   │       │   └───licenses
+│   │       ├───uvicorn
+│   │       │   ├───lifespan
+│   │       │   ├───loops
+│   │       │   ├───middleware
+│   │       │   ├───protocols
+│   │       │   │   ├───http
+│   │       │   │   └───websockets
+│   │       │   └───supervisors
+│   │       ├───uvicorn-0.37.0.dist-info
+│   │       │   └───licenses
+│   │       ├───_pytest
+│   │       │   ├───assertion
+│   │       │   ├───config
+│   │       │   ├───mark
+│   │       │   ├───_code
+│   │       │   ├───_io
+│   │       │   └───_py
+│   │       └───__pycache__
+│   └───Scripts
+├───clients
+│   ├───python
+│   │   └───mail_client_service_client
+│   │       ├───api
+│   │       │   ├───messages
+│   │       │   │   └───__pycache__
+│   │       │   └───__pycache__
+│   │       ├───models
+│   │       │   └───__pycache__
+│   │       └───__pycache__
+│   └───specs
+├───docs
+│   ├───architecture
+│   ├───getting-started
+│   └───reference
+├───scripts
+├───src
+│   ├───email_api
+│   │   ├───src
+│   │   │   └───email_api
+│   │   │       └───__pycache__
+│   │   ├───tests
+│   │   │   └───__pycache__
+│   │   └───__pycache__
+│   ├───gmail_impl
+│   │   ├───src
+│   │   │   └───gmail_impl
+│   │   │       └───__pycache__
+│   │   └───tests
+│   │       └───__pycache__
+│   ├───mail_client_adapter
+│   │   ├───src
+│   │   │   └───mail_client_adapter
+│   │   │       └───__pycache__
+│   │   ├───tests
+│   │   │   └───__pycache__
+│   │   └───__pycache__
+│   └───mail_client_service
+│       ├───src
+│       │   ├───mail_client_service
+│       │   │   ├───routes
+│       │   │   │   └───__pycache__
+│       │   │   └───__pycache__
+│       │   └───mail_client_service.egg-info
+│       ├───tests
+│       │   └───__pycache__
+│       └───__pycache__
+├───tests
+│   ├───e2e
+│   │   └───__pycache__
+│   ├───integration
+│   │   └───__pycache__
+│   └───__pycache__
+└───__pycache__

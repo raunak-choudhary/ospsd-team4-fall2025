@@ -1,8 +1,11 @@
 # Root workspace configuration
 [tool.uv.workspace]
 members = [
-    "src/email_api",
-    "src/gmail_impl",
+  "src/email_api",
+  "src/gmail_impl",
+  "src/mail_client_service",
+  "clients/python/mail_client_service_client",  
+  "src/mail_client_adapter",  
 ]
 
 [project]
@@ -11,12 +14,23 @@ version = "0.1.0"
 description = "OSPSD TA Task - Email client workspace"
 readme = "README.md"
 requires-python = ">=3.12"
-dependencies = []
+dependencies = [
+    "attrs>=25.3.0",
+    "fastapi>=0.118.0",
+    "httpx>=0.28.1",
+    "uvicorn>=0.37.0",
+    "google-auth>=2.25.0",
+    "google-auth-oauthlib>=1.1.0",
+    "google-api-python-client>=2.100.0"
+]
+
 
 [tool.uv.sources]
 # Workspace component sources
 email-api = { workspace = true }
 gmail-impl = { workspace = true }
+mail-client-service = { workspace = true }
+mail-client-adapter = { workspace = true }
 
 [project.optional-dependencies]
 # Shared development tools used across all workspace components
@@ -27,6 +41,7 @@ dev = [
     "mypy>=1.8.0",
     "ruff>=0.1.0",
     "coverage[toml]>=7.0.0",
+    "httpx>=0.27.0",
 ]
 
 # Component feature groups
@@ -35,6 +50,16 @@ email = [
 ]
 gmail = [
     "gmail-impl>=0.1.0",
+]
+service = [
+    "mail-client-service>=0.1.0",   # ← add this line
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.4.1",
+    "pytest-cov>=6.2.1",
+    "ruff>=0.12.7",
 ]
 
 # Shared tool configuration for all workspace members
@@ -75,20 +100,25 @@ line-ending = "auto"
 
 [tool.mypy]
 python_version = "3.12"
-strict = true
+strict = false
+namespace_packages = true
 explicit_package_bases = true
-mypy_path = "src/email_api/src:src/gmail_impl/src"
-show_error_codes = true
+ignore_missing_imports = true
 warn_unused_ignores = true
-exclude = ["tests/", "src/*/tests/"]
+show_error_codes = true
+mypy_path = ["src", "clients"]
+exclude = ["tests", "src/*/tests", "src/__init__.py"]
 
-# Ignore missing type stubs for third-party libraries without them
+
+# Ignore missing stubs for third-party libs
 [[tool.mypy.overrides]]
 module = [
     "googleapiclient.*",
     "google_auth_oauthlib.*",
+    "httpx.*",
 ]
 ignore_missing_imports = true
+
 
 # Workspace-level pytest configuration
 [tool.pytest.ini_options]

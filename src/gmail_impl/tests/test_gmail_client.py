@@ -97,22 +97,26 @@ def mock_authentication() -> Generator[None, None, None]:
         yield
 
 
-
-
 class TestGmailClientMessageRetrieval:
     """Test cases for retrieving messages via the public Client interface."""
 
     def test_get_messages_returns_empty_list_for_empty_inbox(
-        self, mock_gmail_service, mock_authentication,
+        self,
+        mock_gmail_service,
+        mock_authentication,
     ) -> None:
         """Test retrieving messages from an empty inbox returns no messages."""
         mock_gmail_service.users().messages().list().execute.return_value = {
             "messages": [],
         }
 
-        with patch(
-            "gmail_impl.gmail_client.build", return_value=mock_gmail_service,
-        ), patch("gmail_impl.gmail_client.Credentials"):
+        with (
+            patch(
+                "gmail_impl.gmail_client.build",
+                return_value=mock_gmail_service,
+            ),
+            patch("gmail_impl.gmail_client.Credentials"),
+        ):
             client = email_api.get_client()
             messages = list(client.get_messages())
 
@@ -131,9 +135,13 @@ class TestGmailClientMessageRetrieval:
             SAMPLE_GMAIL_MESSAGE
         )
 
-        with patch(
-            "gmail_impl.gmail_client.build", return_value=mock_gmail_service,
-        ), patch("gmail_impl.gmail_client.Credentials"):
+        with (
+            patch(
+                "gmail_impl.gmail_client.build",
+                return_value=mock_gmail_service,
+            ),
+            patch("gmail_impl.gmail_client.Credentials"),
+        ):
             client = email_api.get_client()
             messages = list(client.get_messages())
 
@@ -151,7 +159,9 @@ class TestGmailClientMessageRetrieval:
             assert email.date_sent == datetime(2024, 1, 15, 10, 30, tzinfo=UTC)
 
     def test_get_messages_returns_multiple_emails_in_order(
-        self, mock_gmail_service, mock_authentication,
+        self,
+        mock_gmail_service,
+        mock_authentication,
     ) -> None:
         """Test retrieving multiple emails returns all messages in correct order."""
         mock_gmail_service.users().messages().list().execute.return_value = {
@@ -162,9 +172,13 @@ class TestGmailClientMessageRetrieval:
             SECOND_MESSAGE_DATA,
         ]
 
-        with patch(
-            "gmail_impl.gmail_client.build", return_value=mock_gmail_service,
-        ), patch("gmail_impl.gmail_client.Credentials"):
+        with (
+            patch(
+                "gmail_impl.gmail_client.build",
+                return_value=mock_gmail_service,
+            ),
+            patch("gmail_impl.gmail_client.Credentials"),
+        ):
             client = email_api.get_client()
             messages = list(client.get_messages())
 
@@ -175,7 +189,9 @@ class TestGmailClientMessageRetrieval:
             assert messages[1].subject == "Second Email"
 
     def test_get_messages_with_limit_returns_specified_number(
-        self, mock_gmail_service, mock_authentication,
+        self,
+        mock_gmail_service,
+        mock_authentication,
     ) -> None:
         """Test get_messages with limit parameter returns exact count requested."""
         # Setup: 3 messages available, limit to 2
@@ -188,9 +204,13 @@ class TestGmailClientMessageRetrieval:
             THIRD_MESSAGE_DATA,
         ]
 
-        with patch(
-            "gmail_impl.gmail_client.build", return_value=mock_gmail_service,
-        ), patch("gmail_impl.gmail_client.Credentials"):
+        with (
+            patch(
+                "gmail_impl.gmail_client.build",
+                return_value=mock_gmail_service,
+            ),
+            patch("gmail_impl.gmail_client.Credentials"),
+        ):
             client = email_api.get_client()
             messages = list(client.get_messages(limit=2))
 
@@ -199,28 +219,39 @@ class TestGmailClientMessageRetrieval:
             assert messages[1].id == "msg1"
 
     def test_get_messages_with_zero_limit_returns_empty(
-        self, mock_gmail_service, mock_authentication,
+        self,
+        mock_gmail_service,
+        mock_authentication,
     ) -> None:
         """Test get_messages with limit=0 returns no messages."""
         mock_gmail_service.users().messages().list().execute.return_value = {
             "messages": [{"id": "msg0"}],
         }
 
-        with patch(
-            "gmail_impl.gmail_client.build", return_value=mock_gmail_service,
-        ), patch("gmail_impl.gmail_client.Credentials"):
+        with (
+            patch(
+                "gmail_impl.gmail_client.build",
+                return_value=mock_gmail_service,
+            ),
+            patch("gmail_impl.gmail_client.Credentials"),
+        ):
             client = email_api.get_client()
             messages = list(client.get_messages(limit=0))
 
             assert len(messages) == 0
 
     def test_get_messages_returns_iterator_not_list(
-        self, mock_gmail_service,
+        self,
+        mock_gmail_service,
     ) -> None:
         """Test that get_messages returns an iterator for lazy evaluation."""
-        with patch(
-            "gmail_impl.gmail_client.build", return_value=mock_gmail_service,
-        ), patch("gmail_impl.gmail_client.Credentials"):
+        with (
+            patch(
+                "gmail_impl.gmail_client.build",
+                return_value=mock_gmail_service,
+            ),
+            patch("gmail_impl.gmail_client.Credentials"),
+        ):
             client = email_api.get_client()
             result = client.get_messages()
 
@@ -233,7 +264,9 @@ class TestGmailClientEmailParsing:
     """Test cases for parsing various email formats."""
 
     def test_get_messages_parses_email_with_multiple_recipients(
-        self, mock_gmail_service, mock_authentication,
+        self,
+        mock_gmail_service,
+        mock_authentication,
     ) -> None:
         """Test parsing email with multiple recipients in various formats."""
         message_data = {
@@ -259,9 +292,13 @@ class TestGmailClientEmailParsing:
         }
         mock_gmail_service.users().messages().get().execute.return_value = message_data
 
-        with patch(
-            "gmail_impl.gmail_client.build", return_value=mock_gmail_service,
-        ), patch("gmail_impl.gmail_client.Credentials"):
+        with (
+            patch(
+                "gmail_impl.gmail_client.build",
+                return_value=mock_gmail_service,
+            ),
+            patch("gmail_impl.gmail_client.Credentials"),
+        ):
             client = email_api.get_client()
             messages = list(client.get_messages())
             email = messages[0]
@@ -278,7 +315,9 @@ class TestGmailClientEmailParsing:
             assert email.recipients[2].name == "Charlie"
 
     def test_get_messages_parses_html_email_converts_to_text(
-        self, mock_gmail_service, mock_authentication,
+        self,
+        mock_gmail_service,
+        mock_authentication,
     ) -> None:
         """Test HTML email body is converted to plain text."""
         html_content = "<h1>Title</h1><p>This is a <b>test</b> message.</p>"
@@ -303,9 +342,13 @@ class TestGmailClientEmailParsing:
         }
         mock_gmail_service.users().messages().get().execute.return_value = message_data
 
-        with patch(
-            "gmail_impl.gmail_client.build", return_value=mock_gmail_service,
-        ), patch("gmail_impl.gmail_client.Credentials"):
+        with (
+            patch(
+                "gmail_impl.gmail_client.build",
+                return_value=mock_gmail_service,
+            ),
+            patch("gmail_impl.gmail_client.Credentials"),
+        ):
             client = email_api.get_client()
             messages = list(client.get_messages())
             email = messages[0]
@@ -319,7 +362,9 @@ class TestGmailClientEmailParsing:
             assert "test" in email.body
 
     def test_get_messages_parses_multipart_email_prefers_plain_text(
-        self, mock_gmail_service, mock_authentication,
+        self,
+        mock_gmail_service,
+        mock_authentication,
     ) -> None:
         """Test multipart email extraction prefers plain text over HTML."""
         text_content = "Plain text version"
@@ -361,9 +406,13 @@ class TestGmailClientEmailParsing:
         }
         mock_gmail_service.users().messages().get().execute.return_value = message_data
 
-        with patch(
-            "gmail_impl.gmail_client.build", return_value=mock_gmail_service,
-        ), patch("gmail_impl.gmail_client.Credentials"):
+        with (
+            patch(
+                "gmail_impl.gmail_client.build",
+                return_value=mock_gmail_service,
+            ),
+            patch("gmail_impl.gmail_client.Credentials"),
+        ):
             client = email_api.get_client()
             messages = list(client.get_messages())
             email = messages[0]
@@ -371,7 +420,9 @@ class TestGmailClientEmailParsing:
             assert email.body == "Plain text version"
 
     def test_get_messages_handles_empty_body(
-        self, mock_gmail_service, mock_authentication,
+        self,
+        mock_gmail_service,
+        mock_authentication,
     ) -> None:
         """Test email with no body content returns empty string."""
         message_data = {
@@ -393,9 +444,13 @@ class TestGmailClientEmailParsing:
         }
         mock_gmail_service.users().messages().get().execute.return_value = message_data
 
-        with patch(
-            "gmail_impl.gmail_client.build", return_value=mock_gmail_service,
-        ), patch("gmail_impl.gmail_client.Credentials"):
+        with (
+            patch(
+                "gmail_impl.gmail_client.build",
+                return_value=mock_gmail_service,
+            ),
+            patch("gmail_impl.gmail_client.Credentials"),
+        ):
             client = email_api.get_client()
             messages = list(client.get_messages())
             email = messages[0]
@@ -403,7 +458,9 @@ class TestGmailClientEmailParsing:
             assert email.body == ""
 
     def test_get_messages_handles_missing_subject_header(
-        self, mock_gmail_service, mock_authentication,
+        self,
+        mock_gmail_service,
+        mock_authentication,
     ) -> None:
         """Test email without Subject header defaults to empty string."""
         message_data = {
@@ -425,9 +482,13 @@ class TestGmailClientEmailParsing:
         }
         mock_gmail_service.users().messages().get().execute.return_value = message_data
 
-        with patch(
-            "gmail_impl.gmail_client.build", return_value=mock_gmail_service,
-        ), patch("gmail_impl.gmail_client.Credentials"):
+        with (
+            patch(
+                "gmail_impl.gmail_client.build",
+                return_value=mock_gmail_service,
+            ),
+            patch("gmail_impl.gmail_client.Credentials"),
+        ):
             client = email_api.get_client()
             messages = list(client.get_messages())
             email = messages[0]
@@ -439,67 +500,97 @@ class TestGmailClientErrorHandling:
     """Test cases for error handling during email retrieval."""
 
     def test_get_messages_raises_runtime_error_on_401_unauthorized(
-        self, mock_gmail_service, mock_authentication,
+        self,
+        mock_gmail_service,
+        mock_authentication,
     ) -> None:
         """Test HTTP 401 Unauthorized error raises RuntimeError."""
         mock_gmail_service.users().messages().list().execute.side_effect = HttpError(
-            Mock(status=401), b"Unauthorized",
+            Mock(status=401),
+            b"Unauthorized",
         )
 
-        with patch(
-            "gmail_impl.gmail_client.build", return_value=mock_gmail_service,
-        ), patch("gmail_impl.gmail_client.Credentials"):
+        with (
+            patch(
+                "gmail_impl.gmail_client.build",
+                return_value=mock_gmail_service,
+            ),
+            patch("gmail_impl.gmail_client.Credentials"),
+        ):
             client = email_api.get_client()
             with pytest.raises(RuntimeError):
                 list(client.get_messages())
 
     def test_get_messages_raises_runtime_error_on_403_forbidden(
-        self, mock_gmail_service, mock_authentication,
+        self,
+        mock_gmail_service,
+        mock_authentication,
     ) -> None:
         """Test HTTP 403 Forbidden error raises RuntimeError."""
         mock_gmail_service.users().messages().list().execute.side_effect = HttpError(
-            Mock(status=403), b"Forbidden",
+            Mock(status=403),
+            b"Forbidden",
         )
 
-        with patch(
-            "gmail_impl.gmail_client.build", return_value=mock_gmail_service,
-        ), patch("gmail_impl.gmail_client.Credentials"):
+        with (
+            patch(
+                "gmail_impl.gmail_client.build",
+                return_value=mock_gmail_service,
+            ),
+            patch("gmail_impl.gmail_client.Credentials"),
+        ):
             client = email_api.get_client()
             with pytest.raises(RuntimeError):
                 list(client.get_messages())
 
     def test_get_messages_raises_connection_error_on_500_server_error(
-        self, mock_gmail_service, mock_authentication,
+        self,
+        mock_gmail_service,
+        mock_authentication,
     ) -> None:
         """Test HTTP 500 Internal Server Error raises ConnectionError."""
         mock_gmail_service.users().messages().list().execute.side_effect = HttpError(
-            Mock(status=500), b"Internal Server Error",
+            Mock(status=500),
+            b"Internal Server Error",
         )
 
-        with patch(
-            "gmail_impl.gmail_client.build", return_value=mock_gmail_service,
-        ), patch("gmail_impl.gmail_client.Credentials"):
+        with (
+            patch(
+                "gmail_impl.gmail_client.build",
+                return_value=mock_gmail_service,
+            ),
+            patch("gmail_impl.gmail_client.Credentials"),
+        ):
             client = email_api.get_client()
             with pytest.raises(ConnectionError):
                 list(client.get_messages())
 
     def test_get_messages_raises_connection_error_on_404_not_found(
-        self, mock_gmail_service, mock_authentication,
+        self,
+        mock_gmail_service,
+        mock_authentication,
     ) -> None:
         """Test HTTP 404 Not Found error raises ConnectionError."""
         mock_gmail_service.users().messages().list().execute.side_effect = HttpError(
-            Mock(status=404), b"Not Found",
+            Mock(status=404),
+            b"Not Found",
         )
 
-        with patch(
-            "gmail_impl.gmail_client.build", return_value=mock_gmail_service,
-        ), patch("gmail_impl.gmail_client.Credentials"):
+        with (
+            patch(
+                "gmail_impl.gmail_client.build",
+                return_value=mock_gmail_service,
+            ),
+            patch("gmail_impl.gmail_client.Credentials"),
+        ):
             client = email_api.get_client()
             with pytest.raises(ConnectionError):
                 list(client.get_messages())
 
     def test_get_messages_handles_pagination(
-        self, mock_gmail_service, mock_authentication,
+        self,
+        mock_gmail_service,
+        mock_authentication,
     ) -> None:
         """Test get_messages correctly handles pagination."""
         # First page with nextPageToken
@@ -517,16 +608,22 @@ class TestGmailClientErrorHandling:
             SECOND_MESSAGE_DATA,
         ]
 
-        with patch(
-            "gmail_impl.gmail_client.build", return_value=mock_gmail_service,
-        ), patch("gmail_impl.gmail_client.Credentials"):
+        with (
+            patch(
+                "gmail_impl.gmail_client.build",
+                return_value=mock_gmail_service,
+            ),
+            patch("gmail_impl.gmail_client.Credentials"),
+        ):
             client = email_api.get_client()
             messages = list(client.get_messages())
 
             assert len(messages) == 2
 
     def test_get_messages_skips_malformed_messages(
-        self, mock_gmail_service, mock_authentication,
+        self,
+        mock_gmail_service,
+        mock_authentication,
     ) -> None:
         """Test get_messages skips messages that fail to parse."""
         mock_gmail_service.users().messages().list().execute.return_value = {
@@ -538,9 +635,13 @@ class TestGmailClientErrorHandling:
             FIRST_MESSAGE_DATA,
         ]
 
-        with patch(
-            "gmail_impl.gmail_client.build", return_value=mock_gmail_service,
-        ), patch("gmail_impl.gmail_client.Credentials"):
+        with (
+            patch(
+                "gmail_impl.gmail_client.build",
+                return_value=mock_gmail_service,
+            ),
+            patch("gmail_impl.gmail_client.Credentials"),
+        ):
             client = email_api.get_client()
             messages = list(client.get_messages())
 
@@ -549,22 +650,30 @@ class TestGmailClientErrorHandling:
             assert messages[0].id == "msg0"
 
     def test_get_messages_raises_connection_error_on_generic_exception(
-        self, mock_gmail_service, mock_authentication,
+        self,
+        mock_gmail_service,
+        mock_authentication,
     ) -> None:
         """Test non-HttpError exceptions raise ConnectionError."""
         mock_gmail_service.users().messages().list().execute.side_effect = Exception(
             "Network error",
         )
 
-        with patch(
-            "gmail_impl.gmail_client.build", return_value=mock_gmail_service,
-        ), patch("gmail_impl.gmail_client.Credentials"):
+        with (
+            patch(
+                "gmail_impl.gmail_client.build",
+                return_value=mock_gmail_service,
+            ),
+            patch("gmail_impl.gmail_client.Credentials"),
+        ):
             client = email_api.get_client()
             with pytest.raises(ConnectionError):
                 list(client.get_messages())
 
     def test_parse_message_handles_empty_date(
-        self, mock_gmail_service, mock_authentication,
+        self,
+        mock_gmail_service,
+        mock_authentication,
     ) -> None:
         """Test parsing message with empty date defaults to epoch."""
         message_data = {
@@ -586,9 +695,13 @@ class TestGmailClientErrorHandling:
         }
         mock_gmail_service.users().messages().get().execute.return_value = message_data
 
-        with patch(
-            "gmail_impl.gmail_client.build", return_value=mock_gmail_service,
-        ), patch("gmail_impl.gmail_client.Credentials"):
+        with (
+            patch(
+                "gmail_impl.gmail_client.build",
+                return_value=mock_gmail_service,
+            ),
+            patch("gmail_impl.gmail_client.Credentials"),
+        ):
             client = email_api.get_client()
             messages = list(client.get_messages())
 
@@ -597,7 +710,9 @@ class TestGmailClientErrorHandling:
             assert messages[0].date_sent == datetime.fromtimestamp(0, tz=UTC)
 
     def test_parse_message_handles_invalid_date(
-        self, mock_gmail_service, mock_authentication,
+        self,
+        mock_gmail_service,
+        mock_authentication,
     ) -> None:
         """Test parsing message with invalid date format defaults to epoch."""
         message_data = {
@@ -619,9 +734,13 @@ class TestGmailClientErrorHandling:
         }
         mock_gmail_service.users().messages().get().execute.return_value = message_data
 
-        with patch(
-            "gmail_impl.gmail_client.build", return_value=mock_gmail_service,
-        ), patch("gmail_impl.gmail_client.Credentials"):
+        with (
+            patch(
+                "gmail_impl.gmail_client.build",
+                return_value=mock_gmail_service,
+            ),
+            patch("gmail_impl.gmail_client.Credentials"),
+        ):
             client = email_api.get_client()
             messages = list(client.get_messages())
 
@@ -630,7 +749,9 @@ class TestGmailClientErrorHandling:
             assert messages[0].date_sent == datetime.fromtimestamp(0, tz=UTC)
 
     def test_parse_message_handles_empty_html(
-        self, mock_gmail_service, mock_authentication,
+        self,
+        mock_gmail_service,
+        mock_authentication,
     ) -> None:
         """Test parsing message with empty HTML body."""
         message_data = {
@@ -652,9 +773,13 @@ class TestGmailClientErrorHandling:
         }
         mock_gmail_service.users().messages().get().execute.return_value = message_data
 
-        with patch(
-            "gmail_impl.gmail_client.build", return_value=mock_gmail_service,
-        ), patch("gmail_impl.gmail_client.Credentials"):
+        with (
+            patch(
+                "gmail_impl.gmail_client.build",
+                return_value=mock_gmail_service,
+            ),
+            patch("gmail_impl.gmail_client.Credentials"),
+        ):
             client = email_api.get_client()
             messages = list(client.get_messages())
 
@@ -662,7 +787,9 @@ class TestGmailClientErrorHandling:
             assert messages[0].body == ""
 
     def test_parse_email_addresses_handles_empty_string(
-        self, mock_gmail_service, mock_authentication,
+        self,
+        mock_gmail_service,
+        mock_authentication,
     ) -> None:
         """Test parsing empty email address string."""
         message_data = {
@@ -684,9 +811,13 @@ class TestGmailClientErrorHandling:
         }
         mock_gmail_service.users().messages().get().execute.return_value = message_data
 
-        with patch(
-            "gmail_impl.gmail_client.build", return_value=mock_gmail_service,
-        ), patch("gmail_impl.gmail_client.Credentials"):
+        with (
+            patch(
+                "gmail_impl.gmail_client.build",
+                return_value=mock_gmail_service,
+            ),
+            patch("gmail_impl.gmail_client.Credentials"),
+        ):
             client = email_api.get_client()
             messages = list(client.get_messages())
 
